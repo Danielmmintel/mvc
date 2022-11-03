@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\moyadavx\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\moyadavx\\.nuget\\packages"
+    ]
+  }
+}

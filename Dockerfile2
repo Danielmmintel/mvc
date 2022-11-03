@@ -1,0 +1,44 @@
+FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS base
+WORKDIR /app
+EXPOSE 5000
+
+ENV ASPNETCORE_URLS=http://+:5000
+
+FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
+WORKDIR /src
+COPY ["mvc.csproj", "./"]
+RUN dotnet restore "mvc.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "mvc.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "mvc.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "mvc.dll"]
+
+
+# FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8-windowsservercore-ltsc2019
+# RUN powershell Get-WindowsFeature web-server
+# RUN powershell Install-windowsfeature web-server
+# RUN powershell add-windowsfeature web-asp-net45
+# RUN powershell ./dotnet-install.ps1 -Runtime dotnet -Version 6.0.0
+# RUN powershell -NoProfile -Command Remove-Item -Recurse C:\inetpub\wwwroot\*
+# WORKDIR /inetpub/wwwroot
+# COPY /publish /inetpub/wwwroot
+# RUN dir
+
+
+#COPY --from=publish /inetpub/wwwroot .
+
+# FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8-windowsservercore-ltsc2019
+# RUN powershell -Command Add-WindowsFeature Web-Server;
+# RUN powershell -NoProfile -Command Remove-Item -Recurse C:\inetpub\wwwroot\*
+# WORKDIR /inetpub/wwwroot
+# COPY --from=publish /inetpub/wwwroot .
+# RUN mkdir -p content
+# EXPOSE 5050
+#ENTRYPOINT ["C:\ServiceMonitor.exe", "w3svc"]
